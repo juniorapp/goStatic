@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -28,6 +29,8 @@ var (
 	setBasicAuth             = flag.String("set-basic-auth", "", "Define the basic auth. Form must be user:password")
 	defaultUsernameBasicAuth = flag.String("default-user-basic-auth", "gopher", "Define the user")
 	sizeRandom               = flag.Int("password-length", 16, "Size of the randomized password")
+	originKey                = flag.String("origin-key", "", "TLS key to use")
+	originCert               = flag.String("origin-cert", "", "TLS cert to use")
 
 	username string
 	password string
@@ -136,6 +139,19 @@ func main() {
 
 	http.Handle(pathPrefix, handler)
 
-	log.Printf("Listening at 0.0.0.0%v %v...", port, pathPrefix)
-	log.Fatalln(http.ListenAndServe(port, nil))
+	certFromEnv := os.Getenv("ORIGIN_CERT")
+	if certFromEnv != "" {
+		*originCert = certFromEnv
+	}
+	keyFromEnv := os.Getenv("ORIGIN_KEY")
+	if keyFromEnv != "" {
+		*originKey = keyFromEnv
+	}
+
+	if *originKey == "" && *originCert == "" {
+		log.Printf("Starting HTTP listener at 0.0.0.0%v %v...", port, pathPrefix)
+		log.Fatalln(http.ListenAndServe(port, nil))
+	}
+	log.Printf("Starting HTTPS listener at 0.0.0.0%v %v...", port, pathPrefix)
+	log.Fatalln(http.ListenAndServeTLS(port, *originCert, *originKey, nil))
 }

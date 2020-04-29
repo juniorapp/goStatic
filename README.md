@@ -4,10 +4,6 @@ A really small static web server for Docker
 ### The goal
 My goal is to create to smallest docker container for my web static files. The advantage of Go is that you can generate a fully static binary, so that you don't need anything else.
 
-### Wait, I've been using old versions of GoStatic and things have changed!
-
-Yeah, decided to drop support of unsecured HTTPS. Two-years ago, when I started GoStatic, there was no automatic HTTPS available. Nowadays, thanks to Let's Encrypt, it's really easy to do so. If you need HTTPS, I recommend [caddy](https://caddyserver.com).
-
 ### Features
  * A fully static web server in 6MB
  * No frameworkw
@@ -16,6 +12,7 @@ Yeah, decided to drop support of unsecured HTTPS. Two-years ago, when I started 
  * Light container
  * More security than official images (see below)
  * Log enabled
+ * Ability to provide TLS key and cert for HTTPS support
 
 ### Why?
 Because the official Golang image is wayyyy too big (around 1/2Gb as you can see below) and could be unsecure.
@@ -60,6 +57,10 @@ Usage of /goStatic:
         The listening port (default 8043)
   -set-basic-auth string
         Define the basic auth. Form must be user:password
+  -origin-key
+        Define a path to TLS key for HTTPS support.
+  -origin-cert
+        Define a path to TLS cert for HTTPS support.
 ```
 
 #### Fallback
